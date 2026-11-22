@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head"><h1>Пошук{% if q %}: «{{ q }}»{% endif %}</h1></header>
+<div class="grid">{% for a in results %}{% include "content/_card.html" %}{% empty %}<p>{% if q %}Нічого не знайдено.{% else %}Введіть запит у полі пошуку.{% endif %}</p>{% endfor %}</div>
+{% endblock %}

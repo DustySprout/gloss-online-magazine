@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-card">
+  <h1>Вхід</h1>
+  <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn">Увійти</button></form>
+  <p>Немає акаунта? <a href="{% url 'register' %}">Зареєструватися</a></p>
+</div>
+{% endblock %}

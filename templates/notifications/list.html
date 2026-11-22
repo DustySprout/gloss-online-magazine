@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head">
+  <h1>Сповіщення</h1>
+  <form method="post" action="{% url 'notifications_read' %}">{% csrf_token %}<button class="btn ghost small">Позначити всі прочитаними</button></form>
+</header>
+<ul class="notifications">
+  {% for n in items %}
+  <li class="{% if not n.is_read %}unread{% endif %} kind-{{ n.kind }}">
+    <span class="kicker">{{ n.get_kind_display }} · {{ n.created_at|date:"j.m.Y H:i" }}</span>
+    <strong>{% if n.link %}<a href="{{ n.link }}">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}</strong>
+    <p>{{ n.message }}</p>
+  </li>
+  {% empty %}<li>Сповіщень немає.</li>{% endfor %}
+</ul>
+{% endblock %}

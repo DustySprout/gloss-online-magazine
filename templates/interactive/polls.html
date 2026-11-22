@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head"><h1>Опитування та голосування</h1></header>
+<div class="layout-2">{% for poll in polls %}{% include "interactive/_poll.html" %}{% empty %}<p>Активних опитувань немає.</p>{% endfor %}</div>
+{% endblock %}

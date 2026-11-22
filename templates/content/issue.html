@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ issue }} — {{ site.magazine_name }}{% endblock %}
+{% block content %}
+<header class="page-head {% if issue.is_special %}special-head{% endif %}">
+  <span class="kicker">№{{ issue.number }} · {{ issue.month|date:"F Y" }}{% if issue.is_special %} · Спецвипуск{% endif %}</span>
+  <h1>{{ issue.title }}</h1>
+  {% if issue.theme %}<p>Тема: <b>{{ issue.theme }}</b></p>{% endif %}
+  {% if issue.editor_note %}<blockquote>{{ issue.editor_note|linebreaksbr }}</blockquote>{% endif %}
+</header>
+
+{% regroup items by section as sections %}
+{% for s in sections %}
+  {% if s.grouper %}<h2 class="section-title">{{ s.grouper }}</h2>{% endif %}
+  <div class="grid">{% for item in s.list %}{% with a=item.article %}{% include "content/_card.html" %}{% endwith %}{% endfor %}</div>
+{% endfor %}
+
+<div class="layout-2">
+  {% if issue.featured_poll %}{% include "interactive/_poll.html" with poll=issue.featured_poll %}{% endif %}
+  {% if issue.featured_quiz %}
+  <div class="box">
+    <span class="kicker">Тест випуску</span>
+    <h3>{{ issue.featured_quiz.title }}</h3>
+    <a class="btn small" href="{% url 'quiz' issue.featured_quiz.pk %}">Пройти тест</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

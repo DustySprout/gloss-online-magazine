@@ -1,0 +1,48 @@
+{% load static %}<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site.magazine_name|default:"GLOSS" }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap masthead-top">
+    <a class="logo" href="{% url 'home' %}">{{ site.magazine_name|default:"GLOSS" }}</a>
+    <span class="tagline">{{ site.tagline }}</span>
+    <form class="search" action="{% url 'search' %}">
+      <input name="q" placeholder="Пошук матеріалів" value="{{ q|default:'' }}">
+    </form>
+    <nav class="user-nav">
+      {% if user.is_authenticated %}
+        <a href="{% url 'notifications' %}" class="bell">Сповіщення{% if unread_count %} <b>{{ unread_count }}</b>{% endif %}</a>
+        <a href="{% url 'profile' %}">{{ user.username }}{% if is_premium %} <span class="pill">PREMIUM</span>{% endif %}</a>
+        {% if user.is_staff %}<a href="/admin/">Адмін</a>{% endif %}
+        <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}<button class="link">Вийти</button></form>
+      {% else %}
+        <a href="{% url 'login' %}">Увійти</a>
+        <a class="btn small" href="{% url 'register' %}">Реєстрація</a>
+      {% endif %}
+    </nav>
+  </div>
+  <nav class="wrap rubrics">
+    {% for r in nav_rubrics %}<a href="{{ r.get_absolute_url }}" style="--c: {{ r.color }}">{{ r.name }}</a>{% endfor %}
+    <span class="sep"></span>
+    <a href="{% url 'issues' %}">Випуски</a>
+    <a href="{% url 'polls' %}">Опитування</a>
+    <a href="{% url 'quizzes' %}">Тести</a>
+    <a href="{% url 'premium' %}" class="premium-link">Преміум</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  {% for m in messages %}<div class="flash {{ m.tags }}">{{ m }}</div>{% endfor %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <div class="wrap">© {% now "Y" %} {{ site.magazine_name }} · {{ site.contact_email }} · <a href="/api/">REST API</a></div>
+</footer>
+</body>
+</html>

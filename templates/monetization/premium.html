@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head special-head">
+  <h1>Преміум-підписка</h1>
+  <p>Без реклами, з ексклюзивними фото й відео та матеріалами лише для передплатників.</p>
+  {% if current %}
+    <p>Ваш тариф: <b>{{ current.plan.name }}</b>, діє до {{ current.ends_at|date:"j E Y" }}.</p>
+    <form method="post" action="{% url 'cancel_subscription' %}">{% csrf_token %}<button class="btn ghost small">Скасувати підписку</button></form>
+  {% endif %}
+</header>
+
+<div class="plans">
+  <div class="plan">
+    <h3>Безкоштовно</h3>
+    <div class="price">0 грн</div>
+    <ul><li>Безкоштовні статті</li><li>Показ реклами</li><li>Опитування, тести, коментарі</li></ul>
+  </div>
+  {% for p in plans %}
+  <div class="plan featured">
+    <h3>{{ p.name }}</h3>
+    <div class="price">{{ p.price|floatformat:0 }} грн <small>/ {{ p.duration_days }} дн.</small></div>
+    <ul>
+      {% if p.ad_free %}<li>Без реклами</li>{% endif %}
+      {% if p.exclusive_access %}<li>Ексклюзивні фото й відео</li><li>Преміум-статті</li>{% endif %}
+      {% if p.description %}<li>{{ p.description }}</li>{% endif %}
+    </ul>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'subscribe' p.pk %}">{% csrf_token %}<button class="btn">{% if current and current.plan_id == p.pk %}Продовжити{% else %}Оформити{% endif %}</button></form>
+    {% else %}<a class="btn" href="{% url 'login' %}?next={{ request.path }}">Увійти, щоб оформити</a>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+<p class="note">Оплата в навчальному проєкті імітується: кошти не списуються.</p>
+
+{% if partners %}
+<h2 class="section-title">Наші партнери</h2>
+<div class="partners">{% for p in partners %}<div class="box"><h3>{{ p.name }}</h3><p>{{ p.description }}</p>{% if p.website %}<a href="{{ p.website }}" target="_blank" rel="noopener">Сайт</a>{% endif %}</div>{% endfor %}</div>
+{% endif %}
+{% endblock %}

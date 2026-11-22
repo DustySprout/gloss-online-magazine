@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head"><h1>Тести</h1></header>
+<div class="layout-2">
+  {% for q in quizzes %}
+  <div class="box">
+    <span class="kicker">{{ q.get_kind_display }}</span>
+    <h3>{{ q.title }}</h3>
+    <p>{{ q.description|truncatechars:160 }}</p>
+    <a class="btn small" href="{% url 'quiz' q.pk %}">Пройти</a>
+  </div>
+  {% empty %}<p>Тестів поки немає.</p>{% endfor %}
+</div>
+{% endblock %}

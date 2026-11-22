@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head">
+  <h1>Профіль: {{ user.username }}</h1>
+  {% if subscription %}
+    <p>Підписка <b>{{ subscription.plan.name }}</b> до {{ subscription.ends_at|date:"j E Y" }}</p>
+  {% else %}
+    <p>Безкоштовний доступ із рекламою · <a href="{% url 'premium' %}">Оформити преміум</a></p>
+  {% endif %}
+</header>
+
+<div class="layout">
+  <div>
+    <h2 class="section-title">Рекомендації ({{ prof.get_recommendation_mode_display|lower }})</h2>
+    <div class="grid">{% for a in recommended %}{% include "content/_card.html" %}{% empty %}<p>Оберіть інтереси, щоб отримувати рекомендації.</p>{% endfor %}</div>
+
+    <h2 class="section-title">Збережені матеріали</h2>
+    <div class="grid">{% for a in saved %}{% include "content/_card.html" %}{% empty %}<p>Ви ще нічого не зберегли.</p>{% endfor %}</div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="box">
+      <h3>Налаштування</h3>
+      <form method="post" class="profile-form">{% csrf_token %}{{ form.as_p }}<button class="btn small">Зберегти</button></form>
+    </div>
+
+    <div class="box">
+      <h3>Мої підбірки</h3>
+      <ul class="plain">
+        {% for c in collections %}<li><a href="{% url 'collection' c.pk %}">{{ c.name }}</a> <small>({{ c.articles.count }})</small></li>{% empty %}<li>Підбірок ще немає.</li>{% endfor %}
+      </ul>
+      <form method="post" action="{% url 'collection_create' %}">{% csrf_token %}
+        {{ collection_form.as_p }}
+        <button class="btn small">Створити підбірку</button>
+      </form>
+    </div>
+
+    {% if quiz_results %}
+    <div class="box">
+      <h3>Мої тести</h3>
+      <ul class="plain">{% for r in quiz_results %}<li>{{ r.quiz.title }}: <b>{{ r.summary }}</b></li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+{% if featured %}
+<section class="hero" style="--c: {{ featured.rubric.color }}">
+  <div class="hero-img">{% if featured.cover %}<img src="{{ featured.cover.url }}" alt="">{% endif %}</div>
+  <div class="hero-text">
+    <a class="kicker" href="{{ featured.rubric.get_absolute_url }}">{{ featured.rubric.name }}</a>
+    <h1><a href="{{ featured.get_absolute_url }}">{{ featured.title }}</a></h1>
+    <p>{{ featured.lead }}</p>
+    <a class="btn" href="{{ featured.get_absolute_url }}">Читати</a>
+  </div>
+</section>
+{% else %}
+<section class="empty">
+  <h1>Журнал поки порожній</h1>
+  <p>Додайте рубрики й матеріали в <a href="/admin/">Адмін</a>-панелі або виконайте <code>python manage.py seed_demo</code>.</p>
+</section>
+{% endif %}
+
+<div class="layout">
+  <div>
+    <h2 class="section-title">Свіже</h2>
+    <div class="grid">{% for a in latest %}{% include "content/_card.html" %}{% endfor %}</div>
+
+    {% if recommended %}
+    <h2 class="section-title">{% if user.is_authenticated %}Рекомендовано для вас{% else %}Популярне{% endif %}</h2>
+    <div class="grid">{% for a in recommended %}{% include "content/_card.html" %}{% endfor %}</div>
+    {% endif %}
+  </div>
+
+  <aside class="sidebar">
+    {% if special %}
+    <div class="box special">
+      <span class="kicker">Спецвипуск</span>
+      <h3><a href="{{ special.get_absolute_url }}">{{ special.title }}</a></h3>
+      <p>{{ special.editor_note|truncatechars:120 }}</p>
+      <a class="btn small" href="{{ special.get_absolute_url }}">Відкрити</a>
+    </div>
+    {% endif %}
+    {% if latest_issue %}
+    <div class="box">
+      <span class="kicker">Свіжий номер</span>
+      <h3><a href="{{ latest_issue.get_absolute_url }}">{{ latest_issue }}</a></h3>
+    </div>
+    {% endif %}
+    {% if poll %}{% include "interactive/_poll.html" with poll=poll %}{% endif %}
+    {% if not is_premium %}
+    <div class="box premium-box">
+      <h3>Преміум без реклами</h3>
+      <p>Ексклюзивні фото, відео та жодних банерів.</p>
+      <a class="btn small" href="{% url 'premium' %}">Дізнатися більше</a>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

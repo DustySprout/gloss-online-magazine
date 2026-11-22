@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} — {{ site.magazine_name }}{% endblock %}
+{% block content %}
+<article class="article">
+  <header class="article-head" style="--c: {{ article.rubric.color }}">
+    <a class="kicker" href="{{ article.rubric.get_absolute_url }}">{{ article.rubric.name }} · {{ article.get_kind_display }}</a>
+    <h1>{{ article.title }}</h1>
+    <p class="lead">{{ article.lead }}</p>
+    <div class="meta">
+      {% if article.author %}{{ article.author.get_full_name|default:article.author.username }} · {% endif %}
+      {{ article.published_at|date:"j E Y" }} · {{ article.views }} переглядів
+      {% if article.is_premium %}<span class="pill">PREMIUM</span>{% endif %}
+    </div>
+  </header>
+
+  {% if article.cover %}<img class="article-cover" src="{{ article.cover.url }}" alt="">{% endif %}
+
+  {% if article.video_url %}
+  <div class="video"><iframe src="{{ article.video_url }}" allowfullscreen loading="lazy"></iframe></div>
+  {% endif %}
+
+  <div class="article-body">{{ body_html|safe }}</div>
+
+  {% with gallery=article.gallery_items %}
+  {% if gallery %}
+  <h2 class="section-title">Галерея</h2>
+  <div class="gallery">
+    {% for g in gallery %}<figure><img src="{{ g.image.url }}" alt="{{ g.caption }}"><figcaption>{{ g.caption }}{% if g.is_exclusive %} · ексклюзив{% endif %}</figcaption></figure>{% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
+  {% if article.hidden_exclusive_count %}
+  <p class="note">+{{ article.hidden_exclusive_count }} ексклюзивних фото для передплатників · <a href="{% url 'premium' %}">Оформити преміум</a></p>
+  {% endif %}
+
+  <div class="actions">
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'toggle_save' article.slug %}">{% csrf_token %}
+        <button class="btn {% if is_saved %}ghost{% endif %}">{% if is_saved %}Прибрати зі збережених{% else %}Зберегти{% endif %}</button>
+      </form>
+      {% if collections %}
+      <form method="post" action="{% url 'collection_add' article.slug %}" class="inline-form">{% csrf_token %}
+        <select name="collection">{% for c in collections %}<option value="{{ c.pk }}">{{ c.name }}</option>{% endfor %}</select>
+        <button class="btn ghost">До підбірки</button>
+      </form>
+      {% endif %}
+    {% endif %}
+    <div class="share">
+      Поділитися:
+      <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u={{ share_url|urlencode }}">Facebook</a>
+      <a target="_blank" rel="noopener" href="https://t.me/share/url?url={{ share_url|urlencode }}&text={{ article.title|urlencode }}">Telegram</a>
+      <a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url={{ share_url|urlencode }}&text={{ article.title|urlencode }}">X</a>
+    </div>
+  </div>
+
+  {% for poll in polls %}{% include "interactive/_poll.html" %}{% endfor %}
+
+  <section id="comments" class="comments">
+    <h2 class="section-title">Коментарі ({{ comments|length }})</h2>
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'add_comment' article.slug %}">{% csrf_token %}{{ comment_form.as_p }}<button class="btn">Надіслати</button></form>
+    {% else %}<p><a href="{% url 'login' %}?next={{ request.path }}">Увійдіть</a>, щоб коментувати.</p>{% endif %}
+    {% for c in comments %}
+      <div class="comment"><b>{{ c.user.username }}</b> <small>{{ c.created_at|date:"j.m.Y H:i" }}</small><p>{{ c.text|linebreaksbr }}</p></div>
+    {% endfor %}
+  </section>
+</article>
+
+{% if related %}
+<h2 class="section-title">Читайте також</h2>
+<div class="grid">{% for a in related %}{% include "content/_card.html" %}{% endfor %}</div>
+{% endif %}
+{% endblock %}

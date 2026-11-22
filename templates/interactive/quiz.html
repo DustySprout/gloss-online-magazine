@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }} — {{ site.magazine_name }}{% endblock %}
+{% block content %}
+<header class="page-head"><h1>{{ quiz.title }}</h1><p>{{ quiz.description }}</p></header>
+
+{% if result %}
+<div class="box result">
+  <span class="kicker">Ваш результат</span>
+  <h2>{{ result.title }}</h2>
+  <p>{{ result.description }}</p>
+  <a class="btn ghost" href="{% url 'quiz' quiz.pk %}">Пройти ще раз</a>
+</div>
+{% else %}
+<form method="post" class="quiz">{% csrf_token %}
+  {% for q in questions %}
+  <fieldset>
+    <legend>{{ forloop.counter }}. {{ q.text }}</legend>
+    {% for a in q.answers.all %}
+      <label class="opt"><input type="radio" name="q_{{ q.pk }}" value="{{ a.pk }}" required> {{ a.text }}</label>
+    {% endfor %}
+  </fieldset>
+  {% endfor %}
+  <button class="btn">Дізнатися результат</button>
+</form>
+{% endif %}
+{% endblock %}

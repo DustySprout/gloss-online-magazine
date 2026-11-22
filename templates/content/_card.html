@@ -1,0 +1,12 @@
+<article class="card">
+  <a href="{{ a.get_absolute_url }}" class="card-img" style="--c: {{ a.rubric.color }}">
+    {% if a.cover %}<img src="{{ a.cover.url }}" alt="">{% else %}<span>{{ a.rubric.name }}</span>{% endif %}
+    {% if a.is_premium %}<em class="pill">PREMIUM</em>{% endif %}
+    {% if a.kind == "video" %}<em class="pill dark">ВІДЕО</em>{% elif a.kind == "photo" %}<em class="pill dark">ФОТО</em>{% endif %}
+  </a>
+  <div class="card-body">
+    <a class="kicker" href="{{ a.rubric.get_absolute_url }}" style="color: {{ a.rubric.color }}">{{ a.rubric.name }}</a>
+    <h3><a href="{{ a.get_absolute_url }}">{{ a.title }}</a></h3>
+    <p>{{ a.lead|truncatechars:140 }}</p>
+  </div>
+</article>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head"><h1>Випуски журналу</h1></header>
+<div class="issues">
+  {% for i in issues %}
+  <a class="issue-cover {% if i.is_special %}special{% endif %}" href="{{ i.get_absolute_url }}">
+    {% if i.cover %}<img src="{{ i.cover.url }}" alt="">{% endif %}
+    <span class="num">№{{ i.number }}</span>
+    <strong>{{ i.title }}</strong>
+    <small>{{ i.month|date:"F Y" }}{% if i.is_special %} · спецвипуск{% endif %}</small>
+  </a>
+  {% empty %}<p>Випусків ще немає.</p>{% endfor %}
+</div>
+{% endblock %}

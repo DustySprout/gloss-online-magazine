@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-head">
+  <span class="kicker">Підбірка{% if collection.is_public %} · публічна{% endif %}</span>
+  <h1>{{ collection.name }}</h1>
+  <p>{{ collection.description }}</p>
+  {% if collection.owner == user %}
+  <form method="post" action="{% url 'collection_delete' collection.pk %}">{% csrf_token %}<button class="btn ghost small">Видалити підбірку</button></form>
+  {% endif %}
+</header>
+<div class="grid">
+  {% for a in articles %}
+    <div>
+      {% include "content/_card.html" %}
+      {% if collection.owner == user %}
+      <form method="post" action="{% url 'collection_remove' collection.pk a.pk %}">{% csrf_token %}<button class="link">Прибрати з підбірки</button></form>
+      {% endif %}
+    </div>
+  {% empty %}<p>У підбірці поки немає матеріалів. Додавайте їх зі сторінки статті.</p>{% endfor %}
+</div>
+{% endblock %}

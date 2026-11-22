@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ rubric.name }} — {{ site.magazine_name }}{% endblock %}
+{% block content %}
+<header class="page-head" style="--c: {{ rubric.color }}">
+  <h1>{{ rubric.name }}</h1>
+  <p>{{ rubric.description }}</p>
+</header>
+<div class="grid">{% for a in page %}{% include "content/_card.html" %}{% empty %}<p>У рубриці ще немає матеріалів.</p>{% endfor %}</div>
+{% if page.has_other_pages %}
+<div class="pager">
+  {% if page.has_previous %}<a href="?page={{ page.previous_page_number }}">← Назад</a>{% endif %}
+  <span>{{ page.number }} / {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a href="?page={{ page.next_page_number }}">Далі →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

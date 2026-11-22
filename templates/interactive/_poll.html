@@ -1,0 +1,17 @@
+<div class="box poll">
+  <span class="kicker">Опитування</span>
+  <h3>{{ poll.question }}</h3>
+  <form method="post" action="{% url 'vote' poll.pk %}">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}">
+    {% for o in poll.options.all %}
+      <label class="opt"><input type="radio" name="option" value="{{ o.pk }}"> {{ o.text }}</label>
+    {% endfor %}
+    {% if user.is_authenticated %}<button class="btn small">Голосувати</button>{% else %}<p><a href="{% url 'login' %}">Увійдіть</a>, щоб голосувати.</p>{% endif %}
+  </form>
+  <div class="results">
+    {% for r in poll.results %}
+      <div class="bar"><span style="width: {{ r.percent }}%"></span><em>{{ r.option.text }} — {{ r.percent }}%</em></div>
+    {% endfor %}
+    <small>Усього голосів: {{ poll.total_votes }}</small>
+  </div>
+</div>
