@@ -1,0 +1,77 @@
+// Use Case діаграма системи «GLOSS — тематичний онлайн-журнал»
+digraph UseCase {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=22, labelloc=t, label="Use Case діаграма: тематичний онлайн-журнал GLOSS\n ", nodesep=0.22, ranksep=1.1, pad=0.4, bgcolor=white];
+  node  [fontname="DejaVu Sans", fontsize=13];
+  edge  [fontname="DejaVu Sans", fontsize=11, color="#555555", arrowhead=none];
+
+  // ---------- Актори ----------
+  node [shape=plain, fontsize=14];
+  guest [label=<<TABLE BORDER="0" CELLSPACING="2"><TR><TD FIXEDSIZE="TRUE" WIDTH="46" HEIGHT="64"><IMG SRC="actor.png" SCALE="TRUE"/></TD></TR><TR><TD>Гість</TD></TR></TABLE>>];
+  user [label=<<TABLE BORDER="0" CELLSPACING="2"><TR><TD FIXEDSIZE="TRUE" WIDTH="46" HEIGHT="64"><IMG SRC="actor.png" SCALE="TRUE"/></TD></TR><TR><TD>Зареєстрований<BR/>користувач</TD></TR></TABLE>>];
+  prem [label=<<TABLE BORDER="0" CELLSPACING="2"><TR><TD FIXEDSIZE="TRUE" WIDTH="46" HEIGHT="64"><IMG SRC="actor.png" SCALE="TRUE"/></TD></TR><TR><TD>Передплатник<BR/>(преміум)</TD></TR></TABLE>>];
+  admin [label=<<TABLE BORDER="0" CELLSPACING="2"><TR><TD FIXEDSIZE="TRUE" WIDTH="46" HEIGHT="64"><IMG SRC="actor.png" SCALE="TRUE"/></TD></TR><TR><TD>Адміністратор /<BR/>редактор</TD></TR></TABLE>>];
+
+  // узагальнення акторів
+  user -> guest [arrowhead=onormal, style=solid, color="#333333", constraint=false];
+  prem -> user  [arrowhead=onormal, style=solid, color="#333333", constraint=false];
+
+  // ---------- Межа системи ----------
+  subgraph cluster_sys {
+    label="Система «GLOSS — онлайн-журнал»"; fontsize=16; style="rounded"; color="#888888"; penwidth=1.5; margin=18;
+    node [shape=ellipse, style=filled, fillcolor="#fdf3f7", color="#c2185b", width=2.9, fixedsize=false, labelloc=c, fontsize=12.5, height=0.55];
+
+    // Гість
+    uc_read     [label="Читати статті\nта рубрики"];
+    uc_search   [label="Шукати матеріали"];
+    uc_gallery  [label="Переглядати галереї"];
+    uc_issues   [label="Переглядати випуски\nта «Журнал місяця»"];
+    uc_share    [label="Поділитися статтею\nв соцмережах"];
+    uc_reg      [label="Зареєструватися /\nувійти"];
+    uc_ads      [label="Перегляд реклами\nпартнерів", fillcolor="#f3f3f3", color="#888888"];
+
+    // Користувач
+    uc_comment  [label="Коментувати статтю"];
+    uc_vote     [label="Голосувати\nв опитуванні"];
+    uc_quiz     [label="Проходити тест"];
+    uc_save     [label="Зберігати матеріали"];
+    uc_coll     [label="Створювати власні\nпідбірки"];
+    uc_rec      [label="Отримувати рекомендації\nза інтересами"];
+    uc_interest [label="Налаштувати інтереси"];
+    uc_notif    [label="Отримувати сповіщення"];
+    uc_sub      [label="Оформити підписку"];
+    uc_pay      [label="Оплатити тариф\n(імітація)", fillcolor="#f3f3f3", color="#888888"];
+
+    // Передплатник
+    uc_premium  [label="Читати преміум-\nматеріали"];
+    uc_excl     [label="Дивитися ексклюзивні\nфото та відео"];
+    uc_noads    [label="Читати без реклами"];
+    uc_cancel   [label="Скасувати підписку"];
+
+    // Адміністратор
+    uc_content  [label="Керувати рубриками\nта матеріалами", fillcolor="#eef4fb", color="#1e88e5"];
+    uc_issue    [label="Формувати випуск /\n«Журнал місяця»", fillcolor="#eef4fb", color="#1e88e5"];
+    uc_inter    [label="Керувати опитуваннями\nта тестами", fillcolor="#eef4fb", color="#1e88e5"];
+    uc_moder    [label="Модерувати коментарі", fillcolor="#eef4fb", color="#1e88e5"];
+    uc_plans    [label="Керувати тарифами\nпідписки", fillcolor="#eef4fb", color="#1e88e5"];
+    uc_partner  [label="Керувати партнерами,\nрекламою та акціями", fillcolor="#eef4fb", color="#1e88e5"];
+    uc_settings [label="Змінювати налаштування\nжурналу", fillcolor="#eef4fb", color="#1e88e5"];
+    uc_send     [label="Надіслати сповіщення", fillcolor="#f3f3f3", color="#888888"];
+
+    { rank=same; uc_content; uc_issue; uc_inter; uc_moder; uc_plans; uc_partner; uc_settings; }
+
+    // include / extend
+    edge [style=dashed, arrowhead=vee, color="#666666", fontcolor="#666666", fontsize=10];
+    uc_sub   -> uc_pay   [label="«include»"];
+    uc_ads   -> uc_read  [label="«extend»", constraint=false];
+    uc_rec   -> uc_interest [label="«include»"];
+    uc_send  -> uc_issue [label="«extend»"];
+    uc_send  -> uc_partner [label="«extend»"];
+  }
+
+  // ---------- Зв'язки акторів з прецедентами ----------
+  edge [style=solid, arrowhead=none, color="#777777"];
+  guest -> {uc_read uc_search uc_gallery uc_issues uc_share uc_reg};
+  user  -> {uc_comment uc_vote uc_quiz uc_save uc_coll uc_rec uc_notif uc_sub};
+  prem  -> {uc_premium uc_excl uc_noads uc_cancel};
+  {uc_content uc_issue uc_inter uc_moder uc_plans uc_partner uc_settings} -> admin;
+}
