@@ -5,7 +5,9 @@ from django.utils import timezone
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
-    bio = models.CharField("Про себе", max_length=300, blank=True)
+    bio = models.CharField("Про себе", max_length=300, blank=True,
+                           help_text="Короткий опис, до 300 символів")
+    avatar = models.ImageField("Фото профілю", upload_to="avatars/", blank=True)
     interests = models.ManyToManyField("content.Rubric", blank=True, related_name="interested", verbose_name="Інтереси")
     saved_articles = models.ManyToManyField(
         "content.Article", blank=True, related_name="saved_by", verbose_name="Збережені матеріали"

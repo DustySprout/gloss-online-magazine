@@ -150,9 +150,34 @@ ul.plain li { padding: 4px 0; }
 .notifications p { margin: 4px 0 0; color: var(--muted); }
 .footer { border-top: 1px solid var(--line); padding: 24px 0; color: var(--muted); font-size: 13px; margin-top: 40px; }
 
+
+/* ---------- аватари та біо ---------- */
+.avatar { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; object-fit: cover; flex: none; background: var(--accent); color: #fff; font-weight: 700; }
+.avatar-s { width: 26px; height: 26px; font-size: 12px; }
+.avatar-m { width: 40px; height: 40px; font-size: 16px; }
+.avatar-l { width: 96px; height: 96px; font-size: 38px; font-family: var(--serif); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--accent); }
+.nav-user { display: inline-flex; align-items: center; gap: 8px; }
+.profile-head { display: flex; align-items: center; gap: 24px; }
+.profile-head h1 { margin: 0 0 4px; }
+.profile-bio { font-size: 16px; color: var(--ink); max-width: 640px; margin: 4px 0; }
+.profile-bio.muted { color: var(--muted); font-style: italic; }
+.profile-form textarea { width: 100%; padding: 8px; border: 1px solid var(--line); font: inherit; }
+.profile-form input[type=file] { font-size: 12px; max-width: 100%; }
+.comment { display: flex; gap: 12px; align-items: flex-start; }
+.comment-bio { font-size: 12px; color: var(--muted); font-style: italic; }
+
+
+/* ---------- помилки форм ---------- */
+.errorlist { list-style: none; padding: 0; margin: 4px 0; color: #c62828; font-size: 13px; }
+.field-error { display: block; color: #c62828; font-size: 13px; margin-top: 4px; }
+.has-error input { border-color: #c62828 !important; background: #fff6f6; }
+.form-card .helptext { display: block; margin-top: 4px; }
+.form-card ul.errorlist { font-size: 13px; color: #c62828; }
+
 @media (max-width: 860px) {
   .hero, .layout { grid-template-columns: 1fr; }
   .masthead-top { flex-wrap: wrap; }
   .tagline, .search { display: none; }
   .article-head h1, .hero-text h1 { font-size: 32px; }
+  .profile-head { flex-direction: column; align-items: flex-start; }
 }

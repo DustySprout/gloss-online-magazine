@@ -1,0 +1,8 @@
+{% comment %}Аватар користувача: фото або перша літера імені. Параметри: u (користувач), size (s / m / l).{% endcomment %}
+{% with p=u.profile %}
+  {% if p.avatar %}
+    <img class="avatar avatar-{{ size|default:'s' }}" src="{{ p.avatar.url }}" alt="{{ u.username }}">
+  {% else %}
+    <span class="avatar avatar-{{ size|default:'s' }} avatar-empty">{{ u.username|first|upper }}</span>
+  {% endif %}
+{% endwith %}

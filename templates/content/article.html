@@ -3,7 +3,7 @@
 {% block content %}
 <article class="article">
   <header class="article-head" style="--c: {{ article.rubric.color }}">
-    <a class="kicker" href="{{ article.rubric.get_absolute_url }}">{{ article.rubric.name }} · {{ article.get_kind_display }}</a>
+    <a class="kicker" href="{{ article.rubric.get_absolute_url }}">{{ article.rubric.name }}{% if article.get_kind_display != article.rubric.name %} · {{ article.get_kind_display }}{% endif %}</a>
     <h1>{{ article.title }}</h1>
     <p class="lead">{{ article.lead }}</p>
     <div class="meta">
@@ -61,7 +61,7 @@
     <form method="post" action="{% url 'add_comment' article.slug %}">{% csrf_token %}{{ comment_form.as_p }}<button class="btn">Надіслати</button></form>
     {% else %}<p><a href="{% url 'login' %}?next={{ request.path }}">Увійдіть</a>, щоб коментувати.</p>{% endif %}
     {% for c in comments %}
-      <div class="comment"><b>{{ c.user.username }}</b> <small>{{ c.created_at|date:"j.m.Y H:i" }}</small><p>{{ c.text|linebreaksbr }}</p></div>
+      <div class="comment">{% include "accounts/_avatar.html" with u=c.user size="m" %}<div><b>{{ c.user.username }}</b> <small>{{ c.created_at|date:"j.m.Y H:i" }}</small>{% if c.user.profile.bio %}<div class="comment-bio">{{ c.user.profile.bio|truncatechars:80 }}</div>{% endif %}<p>{{ c.text|linebreaksbr }}</p></div></div>
     {% endfor %}
   </section>
 </article>

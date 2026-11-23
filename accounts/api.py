@@ -39,6 +39,8 @@ def me(request):
     return Response({
         "username": request.user.username,
         "email": request.user.email,
+        "bio": p.bio,
+        "avatar": request.build_absolute_uri(p.avatar.url) if p.avatar else None,
         "interests": list(p.interests.values_list("name", flat=True)),
         "recommendation_mode": p.recommendation_mode,
         "is_premium": p.is_premium,

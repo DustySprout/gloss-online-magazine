@@ -24,7 +24,7 @@ def register(request):
 @login_required
 def profile(request):
     prof = Profile.for_user(request.user)
-    form = ProfileForm(request.POST or None, instance=prof)
+    form = ProfileForm(request.POST or None, request.FILES or None, instance=prof)
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Профіль оновлено")

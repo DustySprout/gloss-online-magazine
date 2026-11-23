@@ -2,6 +2,19 @@
 {% block content %}
 <div class="form-card">
   <h1>Реєстрація</h1>
-  <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn">Створити акаунт</button></form>
+  {% if form.errors %}<div class="flash error">Перевірте поля, позначені червоним.</div>{% endif %}
+  <form method="post" novalidate>{% csrf_token %}
+    {% for field in form %}
+      <p class="field{% if field.errors %} has-error{% endif %}">
+        {{ field.label_tag }}
+        {{ field }}
+        {% for e in field.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+        {% if field.help_text %}<span class="helptext">{{ field.help_text|safe }}</span>{% endif %}
+      </p>
+    {% endfor %}
+    {% for e in form.non_field_errors %}<div class="field-error">{{ e }}</div>{% endfor %}
+    <button class="btn">Створити акаунт</button>
+  </form>
+  <p>Вже є акаунт? <a href="{% url 'login' %}">Увійти</a></p>
 </div>
 {% endblock %}

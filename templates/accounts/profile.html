@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<header class="page-head">
-  <h1>Профіль: {{ user.username }}</h1>
+<header class="page-head profile-head">
+  {% include "accounts/_avatar.html" with u=user size="l" %}
+  <div>
+  <h1>{{ user.get_full_name|default:user.username }}</h1>
+  {% if prof.bio %}<p class="profile-bio">{{ prof.bio }}</p>{% else %}<p class="profile-bio muted">Додайте коротке біо та фото в налаштуваннях праворуч.</p>{% endif %}
   {% if subscription %}
     <p>Підписка <b>{{ subscription.plan.name }}</b> до {{ subscription.ends_at|date:"j E Y" }}</p>
   {% else %}
     <p>Безкоштовний доступ із рекламою · <a href="{% url 'premium' %}">Оформити преміум</a></p>
   {% endif %}
+  </div>
 </header>
 
 <div class="layout">
@@ -21,7 +25,7 @@
   <aside class="sidebar">
     <div class="box">
       <h3>Налаштування</h3>
-      <form method="post" class="profile-form">{% csrf_token %}{{ form.as_p }}<button class="btn small">Зберегти</button></form>
+      <form method="post" enctype="multipart/form-data" class="profile-form">{% csrf_token %}{{ form.as_p }}<button class="btn small">Зберегти</button></form>
     </div>
 
     <div class="box">
