@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Редагування{% else %}Нова публікація{% endif %} — {{ site.magazine_name }}{% endblock %}
+{% block content %}
+<div class="write-card">
+  <span class="kicker">{% if is_edit %}Редагування публікації{% else %}Нова публікація{% endif %}</span>
+  <h1>{% if is_edit %}{{ article.title }}{% else %}Напишіть свою статтю{% endif %}</h1>
+  {% if not is_edit %}<p class="muted">Публікація з'явиться на сайті одразу після збереження, а також у розділах «Новинки місяця» та «Нові публікації».</p>{% endif %}
+
+  {% if form.errors %}<div class="flash error">Перевірте поля, позначені червоним.</div>{% endif %}
+  <form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+    {% for field in form %}
+      <p class="field{% if field.errors %} has-error{% endif %}{% if field.name == 'video_url' %} field-video{% endif %}">
+        {{ field.label_tag }}
+        {{ field }}
+        {% for e in field.errors %}<span class="field-error">{{ e }}</span>{% endfor %}
+        {% if field.help_text %}<span class="helptext">{{ field.help_text }}</span>{% endif %}
+      </p>
+    {% endfor %}
+    <div class="write-actions">
+      <button class="btn">{% if is_edit %}Зберегти зміни{% else %}Опублікувати{% endif %}</button>
+      <a class="btn ghost" href="{% if is_edit %}{{ article.get_absolute_url }}{% else %}{% url 'home' %}{% endif %}">Скасувати</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

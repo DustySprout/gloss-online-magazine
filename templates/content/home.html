@@ -33,14 +33,19 @@
     <div class="box special">
       <span class="kicker">Спецвипуск</span>
       <h3><a href="{{ special.get_absolute_url }}">{{ special.title }}</a></h3>
-      <p>{{ special.editor_note|truncatechars:120 }}</p>
-      <a class="btn small" href="{{ special.get_absolute_url }}">Відкрити</a>
+      <ol class="issue-top">
+        {% for it in special_items %}<li><a href="{{ it.article.get_absolute_url }}">{{ it.article.title }}</a>{% if it.section == "Новинки місяця" %} <em class="pill">НОВЕ</em>{% endif %}</li>{% endfor %}
+      </ol>
+      <a class="btn small" href="{{ special.get_absolute_url }}">Відкрити весь випуск</a>
     </div>
     {% endif %}
     {% if latest_issue %}
     <div class="box">
       <span class="kicker">Свіжий номер</span>
       <h3><a href="{{ latest_issue.get_absolute_url }}">{{ latest_issue }}</a></h3>
+      <ul class="issue-top plain">
+        {% for it in latest_items %}<li><a href="{{ it.article.get_absolute_url }}">{{ it.article.title }}</a>{% if it.section == "Нові публікації" %} <em class="pill">НОВЕ</em>{% endif %}</li>{% endfor %}
+      </ul>
     </div>
     {% endif %}
     {% if poll %}{% include "interactive/_poll.html" with poll=poll %}{% endif %}

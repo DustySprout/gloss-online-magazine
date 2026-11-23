@@ -11,6 +11,12 @@
       {{ article.published_at|date:"j E Y" }} · {{ article.views }} переглядів
       {% if article.is_premium %}<span class="pill">PREMIUM</span>{% endif %}
     </div>
+    {% if can_edit %}
+    <div class="author-tools">
+      <a class="btn small ghost" href="{% url 'edit_article' article.slug %}">Редагувати</a>
+      <form method="post" action="{% url 'delete_article' article.slug %}" class="inline" onsubmit="return confirm('Видалити цю публікацію назавжди?');">{% csrf_token %}<button class="btn small ghost danger">Видалити</button></form>
+    </div>
+    {% endif %}
   </header>
 
   {% if article.cover %}<img class="article-cover" src="{{ article.cover.url }}" alt="">{% endif %}

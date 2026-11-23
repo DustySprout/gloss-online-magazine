@@ -16,6 +16,7 @@
     </form>
     <nav class="user-nav">
       {% if user.is_authenticated %}
+        <a href="{% url 'write_article' %}" class="btn small write-btn">+ Написати</a>
         <a href="{% url 'notifications' %}" class="bell">Сповіщення{% if unread_count %} <b>{{ unread_count }}</b>{% endif %}</a>
         <a href="{% url 'profile' %}" class="nav-user">{% include "accounts/_avatar.html" with u=user size="s" %}{{ user.username }}{% if is_premium %} <span class="pill">PREMIUM</span>{% endif %}</a>
         {% if user.is_staff %}<a href="/admin/">Адмін</a>{% endif %}

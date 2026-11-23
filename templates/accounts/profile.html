@@ -18,6 +18,9 @@
     <h2 class="section-title">Рекомендації ({{ prof.get_recommendation_mode_display|lower }})</h2>
     <div class="grid">{% for a in recommended %}{% include "content/_card.html" %}{% empty %}<p>Оберіть інтереси, щоб отримувати рекомендації.</p>{% endfor %}</div>
 
+    <h2 class="section-title">Мої публікації <a class="btn small" href="{% url 'write_article' %}">+ Написати</a></h2>
+    <div class="grid">{% for a in my_articles %}{% include "content/_card.html" %}{% empty %}<p>Ви ще нічого не публікували. Натисніть «Написати», щоб створити першу статтю.</p>{% endfor %}</div>
+
     <h2 class="section-title">Збережені матеріали</h2>
     <div class="grid">{% for a in saved %}{% include "content/_card.html" %}{% empty %}<p>Ви ще нічого не зберегли.</p>{% endfor %}</div>
   </div>

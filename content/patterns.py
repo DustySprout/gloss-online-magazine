@@ -7,9 +7,10 @@ GoF-патерни підсистеми контенту:
   * Decorator      — ArticleRenderer + декоратори додають рекламу і бейдж партнера.
 """
 from abc import ABC, abstractmethod
-from datetime import date
+from datetime import date, datetime, time
 
 from django.db import transaction
+from django.db.models import Max
 from django.utils import timezone
 from django.utils.html import escape, linebreaks
 
@@ -148,25 +149,77 @@ class IssueBuilder:
 class IssueDirector:
     """Знає типові «рецепти» випусків і керує будівельником."""
 
+    TOP_COUNT = 5     # найпопулярніші статті місяця
+    FRESH_COUNT = 3   # новинки місяця (нові статті ще не мають переглядів)
+
     @staticmethod
-    def magazine_of_the_month(number: int, theme: str, poll=None, quiz=None, publish=True) -> Issue:
-        month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        best = Article.published.filter(published_at__gte=month_start).order_by("-views")[:6]
-        if not best:
-            best = Article.published.order_by("-views")[:6]
+    def _month_start():
+        return timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    @classmethod
+    def month_selection(cls):
+        """Склад «Журналу місяця»: [(статті, розділ), ...] — популярне + новинки."""
+        month = Article.published.filter(published_at__gte=cls._month_start())
+        top = list(month.order_by("-views", "-published_at")[: cls.TOP_COUNT])
+        if not top:
+            top = list(Article.published.order_by("-views")[: cls.TOP_COUNT])
+        fresh = [a for a in month.order_by("-published_at")[: cls.TOP_COUNT + cls.FRESH_COUNT]
+                 if a not in top][: cls.FRESH_COUNT]
+        return [(top[:1], "Головна історія"), (top[1:], "Найпопулярніше"), (fresh, "Новинки місяця")]
+
+    @classmethod
+    def magazine_of_the_month(cls, number: int, theme: str, poll=None, quiz=None, publish=True) -> Issue:
         builder = (
             IssueBuilder(number, f"Журнал місяця: {theme}")
             .as_special(theme)
-            .with_editor_note(f"Найкращі матеріали місяця на тему «{theme}», обрані редакцією та читачами.")
-            .add_articles(best[:1], "Головна історія")
-            .add_articles(best[1:], "Найпопулярніше")
+            .with_editor_note(f"Найпопулярніші матеріали місяця на тему «{theme}» за переглядами читачів, а також свіжі новинки.")
             .published(publish)
         )
+        for articles, section in cls.month_selection():
+            builder.add_articles(articles, section)
         if poll:
             builder.with_poll(poll)
         if quiz:
             builder.with_quiz(quiz)
         return builder.build()
+
+    # ---------- автоматичне оновлення випусків поточного місяця ----------
+    @classmethod
+    @transaction.atomic
+    def refresh_special(cls, issue: Issue) -> bool:
+        """Перезбирає склад «Журналу місяця», якщо популярність чи новинки змінилися."""
+        wanted = [(a.pk, section) for articles, section in cls.month_selection() for a in articles]
+        current = list(issue.items.order_by("order").values_list("article_id", "section"))
+        if wanted == current:
+            return False
+        issue.items.all().delete()
+        for order, (article_id, section) in enumerate(wanted, start=1):
+            IssueItem.objects.create(issue=issue, article_id=article_id, order=order, section=section)
+        return True
+
+    @classmethod
+    @transaction.atomic
+    def add_new_publications(cls, issue: Issue) -> int:
+        """Додає у свіжий номер статті його місяця, яких там ще немає."""
+        month_start = timezone.make_aware(datetime.combine(issue.month, time.min))
+        in_issue = set(issue.items.values_list("article_id", flat=True))
+        new = [a for a in Article.published.filter(published_at__gte=month_start).order_by("published_at")
+               if a.pk not in in_issue]
+        last = issue.items.aggregate(m=Max("order"))["m"] or 0
+        for i, article in enumerate(new, start=1):
+            IssueItem.objects.create(issue=issue, article=article, order=last + i, section="Нові публікації")
+        return len(new)
+
+    @classmethod
+    def sync_current_issues(cls):
+        """Тримає актуальними спецвипуск і свіжий номер поточного місяця."""
+        this_month = cls._month_start().date()
+        special = Issue.objects.filter(is_published=True, is_special=True).first()
+        if special and special.month >= this_month:
+            cls.refresh_special(special)
+        regular = Issue.objects.filter(is_published=True, is_special=False).first()
+        if regular and regular.month >= this_month:
+            cls.add_new_publications(regular)
 
 
 # =====================================================================

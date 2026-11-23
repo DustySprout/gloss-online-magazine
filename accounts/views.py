@@ -37,6 +37,7 @@ def profile(request):
         "recommended": RecommendationService.for_user(request.user).get(request.user, 6),
         "subscription": prof.active_subscription,
         "quiz_results": request.user.quiz_results.select_related("quiz")[:5],
+        "my_articles": request.user.articles.select_related("rubric").order_by("-published_at"),
         "collection_form": CollectionForm(),
     })
 
